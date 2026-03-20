@@ -132,6 +132,125 @@ Helpful downloads subdirectories:
 - `/mnt/downloads/sonartmp/incomplete`
 - `/mnt/downloads/sonartmp/watch`
 
+## Bazarr Bulgarian Subtitles
+
+The stack was later extended with a Bulgarian subtitle workflow in `Bazarr`.
+
+### Working Bazarr Pattern
+
+- `Bazarr` linked to both `Sonarr` and `Radarr`
+- desired language enabled: `bg`
+- language profile created: `Bulgarian`
+- default subtitle profile enabled for:
+  - series
+  - movies
+
+Use a single-language profile if your goal is simply "download Bulgarian subtitles where available".
+
+### Recommended Setup Shape
+
+1. Link `Bazarr` to `Sonarr` and `Radarr`.
+2. Enable `Bulgarian` as a desired language.
+3. Create a language profile named `Bulgarian`.
+4. Set it as the default profile for series and movies.
+5. Assign the profile to existing synced series or movies.
+6. Run a full subtitle scan once.
+7. Run a wanted-subtitles search.
+
+### Runtime Validation Pattern
+
+After setup, verify:
+
+- `Bazarr` health is clean
+- the language profile exists
+- synced series show the expected `profileId`
+- missing subtitle counts look plausible after a full scan
+
+## Bazarr Providers: Saved Config Versus Active Runtime
+
+One important lesson from runtime validation was that saved provider keys and active provider runtime do not always match.
+
+Do not assume a provider is truly active only because its key appears in saved settings.
+
+Safer rule:
+
+- saved config shows what `Bazarr` remembers
+- runtime provider views show what `Bazarr` is actually exposing and attempting to use
+
+When documenting or troubleshooting providers, treat the runtime provider views as authoritative.
+
+## Addic7ed Setup
+
+`Addic7ed` support exists in `Bazarr`, but in practice it may require more than just username and password.
+
+### Common Working Inputs
+
+- username
+- password
+- logged-in browser cookies
+- matching browser user-agent
+
+In some cases, an anti-captcha provider may also be required. For a home LAN-only stack, cookies plus user-agent are often the more practical first choice.
+
+### Safe Procedure
+
+1. Log into `Addic7ed` in a normal browser.
+2. Open browser developer tools.
+3. Copy the logged-in cookies for the site.
+4. Copy the request user-agent from the same browser.
+5. Paste those values into the `Bazarr` `Addic7ed` provider settings.
+6. Enable the provider and validate it in `Bazarr`.
+
+### Security Rule
+
+Never store real cookies, session IDs, usernames, passwords, API keys, or user-agent-derived secret material in public docs, git history, screenshots meant for publication, or commits.
+
+Document only the process, not the live values.
+
+## Unsupported Or Non-Native Bulgarian Subtitle Sites
+
+Do not assume every Bulgarian subtitle site can be added to `Bazarr`.
+
+Examples that should not be treated as verified native Bazarr providers unless runtime proves otherwise:
+
+- `subs.sab.bz`
+- `jordansl.free.bg`
+
+Practical rule:
+
+- if a site is not a native provider in your current Bazarr build, do not document it as part of the supported automation path
+- keep the docs aligned with what the running Bazarr instance can really use
+
+## Import-Path Mismatch Is Still The Main Media Import Failure Mode
+
+This remained the most important operational lesson even after subtitle automation was added.
+
+### Current Translation Model
+
+- qBittorrent reports completed files as `/downloads/complete/...`
+- Sonarr, Radarr, and Lidarr see the same files at `/mnt/downloads/sonartmp/complete/...`
+
+If the importing application is not translating those paths through a remote path mapping, the import fails even when the file is already present on disk.
+
+### Why Subtitle Work Is Different
+
+This import-path mismatch is mainly a `Sonarr` / `Radarr` / `Lidarr` media-import problem.
+
+`Bazarr` normally works from the imported library paths under:
+
+- `/mnt/media/Series/...`
+- `/mnt/media/Movies/...`
+
+So when subtitles fail, look first at:
+
+- provider support
+- credentials or cookies
+- language profile
+- score rules
+- subtitle availability
+
+Do not jump straight to the `/downloads/...` mapping unless the media import itself is failing.
+
 ## Step-By-Step Deployment
 
 ### 1. Create The VM
