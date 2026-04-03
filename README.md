@@ -489,11 +489,19 @@ docker exec lidarr ls -ld /mnt/downloads /mnt/media/Music
 Check local HTTP reachability:
 
 ```bash
-for p in 8080 8989 9696 7878 6767 8686; do
+for p in 8080 8989 9696 7878 6767 8686 8191; do
   code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:$p/ || true)
   echo "$p:$code"
 done
 ```
+
+Check qBittorrent peer port exposure separately:
+
+```bash
+ss -ltnup | grep -E '(:6881\\s)|(:6881$)'
+```
+
+The HTTP loop only checks whether each web service answers an HTTP request on localhost. It does not validate qBittorrent peer traffic on `6881/tcp` and `6881/udp`, app auth, API behavior, or end-to-end downloader/import health.
 
 Then perform one real end-to-end test:
 
