@@ -34,6 +34,7 @@ This design was chosen after an earlier LXC attempt was abandoned. In this proje
 - `Prowlarr`: central indexer manager and app sync layer
 - `Bazarr`: subtitle management
 - `Lidarr`: music management
+- `FlareSolverr`: anti-bot helper used by indexer workflows that need Cloudflare challenge handling
 
 ### Default Service Ports
 
@@ -46,6 +47,7 @@ This design was chosen after an earlier LXC attempt was abandoned. In this proje
 | Radarr | `7878` |
 | Bazarr | `6767` |
 | Lidarr | `8686` |
+| FlareSolverr | `8191` |
 
 ### High-Level Data Flow
 
