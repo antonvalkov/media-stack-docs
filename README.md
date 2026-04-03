@@ -401,6 +401,15 @@ services:
     ports:
       - "8686:8686"
     restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      TZ: "<TIMEZONE>"
+    ports:
+      - "8191:8191"
+    restart: unless-stopped
 ```
 
 Start the stack:
@@ -636,8 +645,13 @@ Update container images:
 ```bash
 cd /opt/media-stack
 docker-compose pull
+docker stop flaresolverr
+docker rm flaresolverr
+docker-compose up -d flaresolverr
 docker-compose up -d
 ```
+
+The explicit `stop` and `rm` step for `flaresolverr` is required when migrating from an older manually created container to the new Compose-managed service. Without that cleanup, Docker reports a container name conflict for `/flaresolverr`.
 
 Check status after updates:
 
@@ -653,6 +667,12 @@ If a compose change breaks the stack:
 1. restore the previous `docker-compose.yml`
 2. run `docker-compose up -d`
 3. re-check container mounts and app reachability
+
+If the `flaresolverr` Compose migration causes trouble:
+
+1. restore the previous `docker-compose.yml`
+2. remove the Compose-managed `flaresolverr` container
+3. recreate the old standalone `flaresolverr` container only if you still need the pre-Compose state
 
 If a mount change breaks imports:
 
